@@ -18,7 +18,6 @@ def main():
         else:
             hand = deck.redraw(hand, indices)
     
-    #hand = ["C10", "CJ", "CQ", "CK", "C1"]
     print("\n=== 最終手札 ===")
     show_hand(hand)
     print(f"役: {evaluate(hand)}")

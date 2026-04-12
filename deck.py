@@ -1,7 +1,7 @@
 import random
 
 SUITS = ['D', 'H', 'S', 'C']
-VALUES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 
 
 class Deck:
@@ -10,7 +10,9 @@ class Deck:
         random.shuffle(self.cards)
 
     def deal(self, n):
-        return [self.cards.pop(0) for _ in range(n)]
+        cards = [self.cards.pop(0) for _ in range(n)]
+        cards.sort()
+        return cards
 
     def redraw(self, hand, indices):
         new_cards = self.deal(len(indices))

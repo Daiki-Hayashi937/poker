@@ -1,5 +1,17 @@
+SUIT_MAP = {
+    'C': 'クローバー',
+    'D': 'ダイヤ',
+    'S': 'スペード',
+    'H': 'ハート',
+}
+
+
+def _format_card(card):
+    return SUIT_MAP[card[0]] + card[1:]
+
+
 def show_hand(hand):
-    print("手札: " + "  ".join(f"[{i}]{c}" for i, c in enumerate(hand)))
+    print("手札: " + "  ".join(f"[{i}]{_format_card(c)}" for i, c in enumerate(hand)))
 
 
 def get_redraw_indices(hand):
