@@ -1,5 +1,3 @@
-from collections import Counter
-
 # A=1, J=11, Q=12, K=13 にマッピング（1〜12の連続した値で役判定）
 VALUE_MAP = {
     'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
@@ -10,12 +8,16 @@ VALUE_MAP = {
 def _parse(card):
     return card[0], VALUE_MAP[card[1:]]
 
-def kinds(hand):
-    suits = [_parse(c)[0] for c in hand]
-    values = sorted(_parse(c)[1] for c in hand)
+def kinds(cards):
+    suits = [_parse(c)[0] for c in cards]
+    # カードの数字は小さい順でソートされています
+    values = sorted(_parse(c)[1] for c in cards)
     return suits, values
 
 def evaluate(hand):
+    # 役が高い順にできるかどうかを試し、できていたら終了としています
+    # なので、例えばツーペアができていたらワンペアの判定は行われません
+    # 逆に、ワンペアの判定でわざわざツーペアを除外する必要はありません
     if royal_flush(hand):
         return "ロイヤルストレートフラッシュ"
     if straight_flush(hand):
@@ -36,26 +38,26 @@ def evaluate(hand):
         return "ワンペア"
     return "ハイカード"
 
-def one_pair(hand):
+def one_pair(cards):
     # カードのスート、数字を持ってくる
-    suits, values = kinds(hand)
+    suits, values = kinds(cards)
 
-    # countsで出てくる数字の個数を数える
+    # countsで出てくる数字の個数を数える。配列は0から始まるので、0~13の14個変数を用意する
     counts = [0 for i in range(14)]
     for v in values:
         counts[v] += 1
     
-    # 数字が多い順に並べなおす
+    # 数字が多い順に配列を並べなおす
     counts.sort(reverse=True)
 
-    # 一番多い数字の個数が2個以上ならワンペアは作れてる
+    # 一番多い数字の個数が2個以上ならワンペア
     if counts[0] >= 2:
         return True
     return False
 
-def two_pair(hand):
+def two_pair(cards):
     # カードのスート、数字を持ってくる
-    suits, values = kinds(hand)
+    suits, values = kinds(cards)
 
     # countsは数字の個数を数えるための配列
     counts = [0 for i in range(14)]
@@ -63,17 +65,19 @@ def two_pair(hand):
     for v in values:
         counts[v] += 1
     
-    # 数字が多い順に並べなおす
+    # 数字が多い順に並べなおす(ソートする)
     counts.sort(reverse=True)
 
-    # 一番多い数字の個数が2個以上かつ次に多い数字の個数も2個以上ならツーペア作れる
-    if counts[0] >= 2 and counts[1] >= 2:
-        return True
+    # ソート後のcounts = [2, 2, 1, 0, 0, ..., 0] みたいになっています
+    # 一番多い数字の個数が2個以上かつ次に多い数字の個数も2個以上ならツーペア
+    # if A and B: とすると、AとBの条件をともに満たすときに処理が実装されます
+    #if ???:
+    #    return True
     return False
 
-def three_card(hand):
+def three_card(cards):
     # カードのスート、数字を持ってくる
-    suits, values = kinds(hand)
+    suits, values = kinds(cards)
 
     # countsで出てくる数字の個数を数える
     counts = [0 for i in range(14)]
@@ -88,42 +92,33 @@ def three_card(hand):
         return True
     return False
 
-def straight(hand):
-    # むずい！！！ コメントでは例としてvalues = [1, 10, 11, 12, 13]で進めます
-    suits, values = kinds(hand)
+def straight(cards):
+    suits, values = kinds(cards)
 
-    #1スタートだとmodを使いにくいので、valuesの値を-1する 例: [0, 9, 10, 11, 12]
-    values = [v - 1 for v in values]
-    for i in range(5):
-        cont = True
-        for j in range(5):
-            # ストレートならば、うまく並び替えることでmod13で連続するようにできます
-            # 例:[0, 9, 10, 11, 12] -> [9, 10, 11, 12, 0(=13)]
-            # 配列がソートされていることを用いることで、簡単に実装できます
-            if values[(i + j) % 5] != (values[i] + j) % 13: 
-                cont = False
-        if cont:
-            return True
+    # 上級者用: ロジックを組み立ててみましょう
+    # ヒント: values=[1, 2, 3, 4, 5]のときと[10, 11, 12, 13, 1]のときを一緒に扱いたいです
     return False
 
-def flush(hand):
+def flush(cards):
     # カードのスート、数字を持ってくる
-    suits, values = kinds(hand)
+    suits, values = kinds(cards)
 
-    # countsで出てくる数字の個数を数える
+    # countsで出てくるスートの個数を数える
+    # 辞書型を使う
     counts = {"C": 0, "D" : 0, "H" : 0, "S" : 0}
     for s in suits:
         counts[s] += 1
     
-    for c in counts.values():
-        # 5枚ある→すべてスートが同じ
-        if c == 5:
-            return True
+    # for c in counts.values():
+        # このループではC, D, H, Sがそれぞれ何枚あるかを調べています
+        # すべてスートが同じということは..？
+        #if ???:
+        #    return True
     return False
 
-def full_house(hand):
+def full_house(cards):
     # カードのスート、数字を持ってくる
-    suits, values = kinds(hand)
+    suits, values = kinds(cards)
 
     # countsで出てくる数字の個数を数える
     counts = [0 for i in range(14)]
@@ -133,14 +128,14 @@ def full_house(hand):
     # 数字が多い順に並べなおす
     counts.sort(reverse=True)
 
-    # 一番多い数字の個数が3個かつ次に多い数字の個数も2個ならフルハウス
-    if counts[0] == 3 and counts[1] == 2:
-        return True
+    # フルハウスの条件は...？
+    #if ???:
+    #    return True
     return False
 
-def four_card(hand):
+def four_card(cards):
     # カードのスート、数字を持ってくる
-    suits, values = kinds(hand)
+    suits, values = kinds(cards)
 
     # countsで出てくる数字の個数を数える
     counts = [0 for i in range(14)]
@@ -155,18 +150,20 @@ def four_card(hand):
         return True
     return False
 
-def straight_flush(hand):
+def straight_flush(cards):
     #ストレートフラッシュにはストレートかつフラッシュが必要
-    if straight(hand) and flush(hand):
+    if straight(cards) and flush(cards):
         return True
     return False
 
-def royal_flush(hand):
-    #ロイヤルストレートフラッシュにはストレートフラッシュが必要
-    if not straight_flush(hand):
-        return False
-    suits, values = kinds(hand)
-    # 10, J(=11), Q(=12), K(=13), A(=1)をソートすると1, 10, 11, 12, 13
-    if values[0] == 1 and values[1] == 10:
-        return True
+def royal_flush(cards):
+    #ロイヤルストレートフラッシュにはストレートフラッシュが必要なので...？
+    #if ???:
+    #    return False
+
+    suits, values = kinds(cards)
+
+    # 10, J(=11), Q(=12), K(=13), A(=1)をソートすると1, 10, 11, 12, 13なことを用いると...？
+    #if ???:
+    #    return True
     return False

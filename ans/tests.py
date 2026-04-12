@@ -3,7 +3,7 @@ from rules import evaluate
 #テストケースで実装が正しいかを確認します。
 
 def tests():
-    
+
     # === 成功ケース ===
 
     # ハイカード
