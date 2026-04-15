@@ -90,18 +90,14 @@ def straight(cards):
     # むずい！！！ コメントでは例としてvalues = [1, 10, 11, 12, 13]で進めます
     suits, values = kinds(cards)
 
-    #1スタートだとmodを使いにくいので、valuesの値を-1する 例: [0, 9, 10, 11, 12]
-    values = [v - 1 for v in values]
-
     for i in range(5):
         cont = True
         for j in range(5):
-            # ストレートならば、うまく並び替えることでmod13で連続するようにできます
-            # 例:[0, 9, 10, 11, 12] -> [9, 10, 11, 12, 0(=13)]
-            # 配列がソートされていることを用いることで、簡単に実装できます
-            if values[(i + j) % 5] != (values[i] + j) % 13: 
+            if values[i] != (values[0] + i: 
                 cont = False
         if cont:
+            return True
+        if values == [1,10,11,12,13]:
             return True
     return False
 
