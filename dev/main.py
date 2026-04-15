@@ -10,7 +10,7 @@ def main():
 
     # 引き直し回数を増やすには？
     for i in range(2):
-        print(f"\n--- 引き直し {i + 1}/{n} ---")
+        print(f"\n--- 引き直し {i + 1}/{2} ---")
         indices = get_redraw_indices(hand)
         if not indices:
             print("引き直しなし")
